@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 import requests
 import logging
 import logging.config
+from functools import reduce
 logging.basicConfig(filename='output.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # get the Dynatrace Environmemnt (URL) and the API Token with arguments
@@ -16,12 +17,16 @@ parser.add_argument("-e", "--env", dest="environment", help="The Dynatrace Envir
 parser.add_argument("-t", "--token", dest="token", help="The Dynatrace API Token to use", required=True)
 parser.add_argument("--tag", dest="tag", help="Process Group Tag to filter by")
 parser.add_argument("--mz", dest="mz", help="Management Zone to filter by")
+parser.add_argument("--host", dest="host", help="Management Zone to filter by")
 
 args = parser.parse_args()
 env = args.environment
 token = args.token
 tag = args.tag
 mz = args.mz
+host = args.host
+
+processTypes = ['DOTNET', 'IIS_APP_POOL', 'JAVA', 'NODE_JS', 'PHP']
 
 def get(endpoint):
         """
@@ -49,10 +54,16 @@ def getPGs():
         url += ',mzName("'+mz+'")'
     elif tag:
         url += ',tag('+tag+')'
+    elif host:
+        url += ',fromRelationships.runsOn(entityId("'+host+'"))'
+    url += '&fields=+fromRelationships,+properties'
     response = get(url)
     pgs += response['entities']
     return pgs
 
+
 pgs = getPGs()
 for pg in pgs:
-    print(pg['entityId'] + ','+ pg['displayName'])
+    if 'softwareTechnologies' in pg['properties'] and any (e for e in pg['properties']['softwareTechnologies'] if e['type'] in processTypes):
+    # if pg['properties']['softwareTechnologies']['type'] in processTypes:
+        print(pg['entityId'] + ','+ pg['displayName']+','+ reduce(lambda a,b: a+' '+b['id'], pg['fromRelationships']['runsOn'], ''))
