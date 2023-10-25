@@ -89,7 +89,7 @@ def splitIntoChunks(list, maxLength):
         for i in range(0, len(list), maxLength):
             yield list[i:i + maxLength]
 
-def toggleSetting(enable, pgIds):
+def toggleOneAgentSetting(enable, pgIds):
     payload = list(map(lambda pgId:  {
             "schemaId": "builtin:oneagent.features",
             "value": {
@@ -103,12 +103,35 @@ def toggleSetting(enable, pgIds):
     response = post('/api/v2/settings/objects/', payload)
     print(response)
 
+def createMonitoringRule(enable, pgIds):
+    payload = list(map(lambda pgId:   {
+      "schemaId": "builtin:appsec.code-level-vulnerability-rule-settings",
+      "scope": "environment",
+      "value": {
+        "enabled": enable,
+        "criteria": {
+          "processGroup": pgId
+        },
+        "vulnerabilityDetectionControl": {
+          "monitoringMode": "MONITORING_ON"
+        },
+        "metadata": {
+          "comment": ""
+        }
+      }
+    }, pgIds))
+    response = post('/api/v2/settings/objects/', payload)
+    print(response)
+
+
 # print(settings)
 
 if command == 'enable':
-    toggleSetting(True, pgIds)
+    toggleOneAgentSetting(True, pgIds)
+    createMonitoringRule(True, pgIds)
 elif command == 'disable':
-    toggleSetting(False, pgIds)
+    toggleOneAgentSetting(False, pgIds)
+    #createMonitoringRule(False, pgIds)
 else:
     settings = getFlawFinderSettings()
     pgIdsWithSettings = list(filter(lambda e: e.startswith("PROCESS_GROUP"), map(lambda e: e['scope'],settings)))

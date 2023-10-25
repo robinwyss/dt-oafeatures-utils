@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-from cgitb import enable
-import string
-import sys
-import csv
 from argparse import ArgumentParser
 import requests
 import logging
 import logging.config
 from functools import reduce
+
 logging.basicConfig(filename='output.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # get the Dynatrace Environmemnt (URL) and the API Token with arguments
@@ -18,6 +15,7 @@ parser.add_argument("-t", "--token", dest="token", help="The Dynatrace API Token
 parser.add_argument("--tag", dest="tag", help="Process Group Tag to filter by")
 parser.add_argument("--mz", dest="mz", help="Management Zone to filter by")
 parser.add_argument("--host", dest="host", help="Management Zone to filter by")
+parser.add_argument("--name", dest="name", help="Filters by the name of the PG, uses a startswith logic")
 
 args = parser.parse_args()
 env = args.environment
@@ -25,6 +23,7 @@ token = args.token
 tag = args.tag
 mz = args.mz
 host = args.host
+name = args.name
 
 processTypes = ['DOTNET', 'IIS_APP_POOL', 'JAVA', 'NODE_JS', 'PHP']
 
@@ -52,10 +51,12 @@ def getPGs():
     url = '/api/v2/entities?pageSize=500&entitySelector=type(PROCESS_GROUP)'
     if mz:
         url += ',mzName("'+mz+'")'
-    elif tag:
+    if tag:
         url += ',tag('+tag+')'
-    elif host:
+    if host:
         url += ',fromRelationships.runsOn(entityId("'+host+'"))'
+    if name:
+         url += ',entityName.startsWith("'+name+'")'
     url += '&fields=+fromRelationships,+properties'
     response = get(url)
     pgs += response['entities']
