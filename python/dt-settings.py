@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-from cgitb import enable
 from argparse import ArgumentParser
-from concurrent.futures import process
 import csv
 from fileinput import filename
 import requests
@@ -128,7 +126,7 @@ def createMonitoringRule(enable, pgIds):
 
 if command == 'enable':
     toggleOneAgentSetting(True, pgIds)
-    createMonitoringRule(True, pgIds)
+    #createMonitoringRule(True, pgIds)
 elif command == 'disable':
     toggleOneAgentSetting(False, pgIds)
     #createMonitoringRule(False, pgIds)
