@@ -1,5 +1,5 @@
 # Python OA Utils
-There are two python scripts that can be used to query process groups based on different criteria (MZ, Tag, name, host) and then enable or disable the OA features for Code Level vulnerabilities. 
+There are two python scripts that can be used to query process groups based on different criteria (MZ, Tag, name, host) and then enable or disable the OA features for Code Level vulnerabilities and Runtime Application Protection. 
 
 ## How to use
 
@@ -65,6 +65,8 @@ options:
                         The Dynatrace Environment to query
   -t TOKEN, --token TOKEN
                         The Dynatrace API Token to use
+  -o OPTION, --option OPTION
+                      The OneAgent feature to toggle, can either be [clv] for code-level vulnerabilities or [rap] for runtime application protection
   -p PROCESS_GROUPS [PROCESS_GROUPS ...], --process-groups PROCESS_GROUPS [PROCESS_GROUPS ...]
                         List of Process Group IDs
   -f FILE, --file FILE  CSV file containing the Process Group in the first column (no header)
@@ -75,19 +77,21 @@ The command supports
 - `list` to show the status
 
 #### Examples
-Enable it for PGs stored in CSV file (see step above to generate the CSV):
+Enable Code-level vulnerabilities for PGs stored in CSV file (see step above to generate the CSV):
 ```bash
-python3 dt-settings.py enable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
+python3 dt-settings.py enable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
 ```
 Disable it again
 ```bash
-python3 dt-settings.py disable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
+python3 dt-settings.py disable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
 ```
 Show the status
 ```bash
-python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
 ```
 Instead of a CSV, a list of PGs can also be provided
 ```bash
-python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX -p "PROCESS_GROUP_1,PROCESS_GROUPS_2,..."
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX -p "PROCESS_GROUP_1,PROCESS_GROUPS_2,...  -o clv"
 ```
+
+To do the same for Runtime Application Protection replace `-o clv` with `-o rap`
