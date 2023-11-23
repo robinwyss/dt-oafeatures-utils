@@ -13,17 +13,26 @@ parser = ArgumentParser()
 parser.add_argument('command')
 parser.add_argument("-e", "--env", dest="environment", help="The Dynatrace Environment to query", required=True)
 parser.add_argument("-t", "--token", dest="token", help="The Dynatrace API Token to use", required=True)
+parser.add_argument('-o', '--option', help="The OneAgent feature to toggle, can either be [clv] for code-level vulnerabilities or [rap] for runtime application protection", required=True)
 parser.add_argument('-p', '--process-groups', help="List of Process Group IDs", nargs='+', default=[])
 parser.add_argument('-f', '--file', help="CSV file containing the Process Group in the first column (no header)")
 
 args = parser.parse_args()
 env = args.environment
 token = args.token
+option = args.option 
 command = args.command
 pgIds = args.process_groups
 filename = args.file
 
-settingsKey = 'SENSOR_JAVA_CASP_FLAW_FINDER'
+if option == 'clv':
+    settingsKey = 'JAVA_CASP_FLAW_FINDER_IAST'
+elif option == 'rap':
+    settingsKey = 'SENSOR_JAVA_CASP_FLAW_FINDER'
+else:
+    raise Exception('Unknown option ' + option + ' allowed values are clv and rap')
+
+
 if filename:
     pgIds = []
     with open(filename, newline='') as csvfile:
@@ -88,20 +97,35 @@ def splitIntoChunks(list, maxLength):
             yield list[i:i + maxLength]
 
 def toggleOneAgentSetting(enable, pgIds):
-    payload = list(map(lambda pgId:  {
+    payload = list(map(lambda pgId: getSettings(pgId, enable), pgIds))
+    response = post('/api/v2/settings/objects/', payload)
+    print(response)
+
+def getSettings(pgId, enable):
+    if option == 'clv':
+        return {
+            "schemaId": "builtin:oneagent.features",
+            "value": {
+                        "enabled": enable,
+                        "key": settingsKey
+            },
+            "schemaVersion": "1.5.4",
+            "scope": pgId
+        }
+    elif option == 'rap':
+        return  {
             "schemaId": "builtin:oneagent.features",
             "value": {
                         "enabled": enable,
                         "instrumentation": enable,
-                        "key": "SENSOR_JAVA_CASP_FLAW_FINDER"
+                        "key": settingsKey
             },
             "schemaVersion": "1.5.4",
             "scope": pgId
-        }, pgIds))
-    response = post('/api/v2/settings/objects/', payload)
-    print(response)
+        }
 
 def createMonitoringRule(enable, pgIds):
+    # TODO: adjust for RAP    
     payload = list(map(lambda pgId:   {
       "schemaId": "builtin:appsec.code-level-vulnerability-rule-settings",
       "scope": "environment",
