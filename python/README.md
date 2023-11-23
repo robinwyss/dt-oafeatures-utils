@@ -79,19 +79,19 @@ The command supports
 #### Examples
 Enable Code-level vulnerabilities for PGs stored in CSV file (see step above to generate the CSV):
 ```bash
-python3 dt-settings.py enable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
+python3 dt-settings.py enable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv" -o clv
 ```
 Disable it again
 ```bash
-python3 dt-settings.py disable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
+python3 dt-settings.py disable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv" -o clv
 ```
 Show the status
 ```bash
-python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv -o clv"
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv" -o clv
 ```
 Instead of a CSV, a list of PGs can also be provided
 ```bash
-python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX -p "PROCESS_GROUP_1,PROCESS_GROUPS_2,...  -o clv"
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX -p "PROCESS_GROUP_1,PROCESS_GROUPS_2,..."  -o clv
 ```
 
 To do the same for Runtime Application Protection replace `-o clv` with `-o rap`
