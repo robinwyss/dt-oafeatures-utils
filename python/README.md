@@ -77,17 +77,17 @@ The command supports
 #### Examples
 Enable it for PGs stored in CSV file (see step above to generate the CSV):
 ```bash
-python3 enable dt-entities.py -e https://XXX.dynatrace.com -t dt0c01.XXX --file pgs.csv"
+python3 dt-settings.py enable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
 ```
 Disable it again
 ```bash
-python3 disable dt-entities.py -e https://XXX.dynatrace.com -t dt0c01.XXX --file pgs.csv"
+python3 dt-settings.py disable -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
 ```
 Show the status
 ```bash
-python3 list dt-entities.py -e https://XXX.dynatrace.com -t dt0c01.XXX --file pgs.csv"
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX --file "pgs.csv"
 ```
 Instead of a CSV, a list of PGs can also be provided
 ```bash
-python3 list dt-entities.py -e https://XXX.dynatrace.com -t dt0c01.XXX -p PROCESS_GROUP_1,PROCESS_GROUPS_2,..."
+python3 dt-settings.py list -e https://XXX.dynatrace.com -t dt0c01.XXX -p "PROCESS_GROUP_1,PROCESS_GROUPS_2,..."
 ```
